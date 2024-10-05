@@ -124,6 +124,17 @@ resource "aws_network_acl_rule" "network_acl_rule_inbound_100" {
   to_port        = 22
 }
 
+resource "aws_network_acl_rule" "network_acl_rule_inbound_110" {
+  network_acl_id = aws_network_acl.network_acl.id
+  rule_number    = "110"
+  egress         = false
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = "0.0.0.0/0"
+  from_port      = 137
+  to_port        = 139
+}
+
 resource "aws_network_acl_rule" "network_acl_rule_outbound_100" {
   network_acl_id = aws_network_acl.network_acl.id
   rule_number    = "100"
@@ -133,6 +144,17 @@ resource "aws_network_acl_rule" "network_acl_rule_outbound_100" {
   cidr_block     = "0.0.0.0/0"
   from_port      = 22
   to_port        = 22
+}
+
+resource "aws_network_acl_rule" "network_acl_rule_outbound_110" {
+  network_acl_id = aws_network_acl.network_acl.id
+  rule_number    = "110"
+  egress         = true
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = "0.0.0.0/0"
+  from_port      = 137
+  to_port        = 139
 }
 
 ########################################
