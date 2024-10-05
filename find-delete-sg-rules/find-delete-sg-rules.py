@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""Uses the AWS Boto3 Python library to find and revoke security group rules that meet user-provided criteria. This program is licensed under the terms of the GNU General Public License v3.0.
+"""Uses the AWS Boto3 Python library to find and delete security group rules that meet user-provided criteria. This program is licensed under the terms of the GNU General Public License v3.0.
 """
 
 import argparse
@@ -22,14 +22,14 @@ def check_ip_protocol(ip_protocol: str):
     protocols  = ["tcp", "udp"]
     if ip_protocol not in protocols:
         print("Invalid ip_protocol value for this script. Please enter tcp or udp.")
-        raise SystemExit(52)
+        raise SystemExit(51)
 
 
 def check_port(port: int):
-    """Checks if port number is valid; exits on failure."""
+    """Checks if port range value is valid; exits on failure."""
     if port not in range(65536):
         print("Invalid port range value. Please enter a number in the range of 0-65535.")
-        raise SystemExit(53)
+        raise SystemExit(52)
 
 
 def check_cidr_ipv4(cidr_ipv4: str):
@@ -38,20 +38,20 @@ def check_cidr_ipv4(cidr_ipv4: str):
         ip = ipaddress.ip_network(cidr_ipv4)
     except ValueError:
         print("Invalid cidr_ipv4 value. Please enter a valid IPv4 CIDR address.")
-        raise SystemExit(54)
+        raise SystemExit(53)
 
 
 def find_sg_rules(args: list) -> list:
-    """Searches for rules based on revoke criteria."""
-    # Declare list and dictionary to store rules that meet revoke criteria
-    revoke_sg_rules: list[dict] = [] 
-    revoke_sg_rule: dict[str, str] = {}
+    """Searches for rules based on delete criteria."""
+    # Declare list and dictionary to store rules that meet delete criteria
+    delete_sg_rules: list[dict] = [] 
+    delete_sg_rule: dict[str, str] = {}
 
     # Get dictionary of existing rules
     client = boto3.client("ec2")
     existing_sg_rules = client.describe_security_group_rules().get("SecurityGroupRules")
 
-    # Search for exising rules that meet revoke criteria and append to list
+    # Search for exising rules that meet delete criteria and append to list
     for rule in existing_sg_rules:
         if (
             rule.get("IsEgress") == eval(args.is_egress) and
@@ -60,41 +60,41 @@ def find_sg_rules(args: list) -> list:
             rule.get("ToPort") == args.to_port and
             rule.get("CidrIpv4") == args.cidr_ipv4
         ):
-            revoke_sg_rule = {
+            delete_sg_rule = {
                 "security_group_id":rule.get("GroupId"),
                 "security_group_rule_id":rule.get("SecurityGroupRuleId")
             }
-            revoke_sg_rules.append(revoke_sg_rule)
+            delete_sg_rules.append(delete_sg_rule)
 
-    return revoke_sg_rules
+    return delete_sg_rules
 
 
-def revoke_sg_rules_ingress(revoke_sg_rules: list):
-    """Revokes existing rules that match user-provided criteria."""
+def delete_sg_rules_ingress(delete_sg_rules: list):
+    """Deletes existing ingress rules that meet delete criteria."""
     client = boto3.client("ec2")
-    for rule in revoke_sg_rules:
+    for rule in delete_sg_rules:
         response = client.revoke_security_group_ingress(
             GroupId='{}'.format(rule['security_group_id']),
             SecurityGroupRuleIds=['{}'.format(rule['security_group_rule_id'])]
         )
         if response['Return'] == True:
-            print("SUCCESS - The following rule was revoked:", rule['security_group_rule_id'])
+            print("SUCCESS - The following rule was deleted:", rule['security_group_rule_id'])
         else:
-            print("ERROR - The following rule was NOT revoked:", rule['security_group_rule_id'])         
+            print("ERROR - The following rule was NOT deleted:", rule['security_group_rule_id'])         
 
 
-def revoke_sg_rules_egress(revoke_sg_rules: list):
-    """Revokes existing rules that match user-provided criteria."""
+def delete_sg_rules_egress(delete_sg_rules: list):
+    """Deletes existing rules that meet delete criteria."""
     client = boto3.client("ec2")
-    for rule in revoke_sg_rules:
+    for rule in delete_sg_rules:
         response = client.revoke_security_group_egress(
             GroupId='{}'.format(rule['security_group_id']),
             SecurityGroupRuleIds=['{}'.format(rule['security_group_rule_id'])]
         )
         if response['Return'] == True:
-            print("SUCCESS - The following rule was revoked:", rule['security_group_rule_id'])
+            print("SUCCESS - The following rule was deleted:", rule['security_group_rule_id'])
         else:
-            print("ERROR - The following rule was NOT revoked:", rule['security_group_rule_id'])         
+            print("ERROR - The following rule was NOT deleted:", rule['security_group_rule_id'])         
 
 
 def main(arguments):
@@ -116,15 +116,15 @@ def main(arguments):
     check_port(args.to_port)
     check_cidr_ipv4(args.cidr_ipv4)
 
-    # Find rules to revoke and send to revoke function 
-    revoke_sg_rules = find_sg_rules(args)
-    if len(revoke_sg_rules) == 0:
-        print("No rules found meeting the provided criteria.")
+    # Find rules that meet delete criteria and send to appropriate delete function 
+    delete_sg_rules = find_sg_rules(args)
+    if len(delete_sg_rules) == 0:
+        print("No rules found meeting the provided delete criteria.")
     else:
         if eval(args.is_egress) == True:
-            revoke_sg_rules_egress(revoke_sg_rules)
+            delete_sg_rules_egress(delete_sg_rules)
         elif eval(args.is_egress) == False:
-            revoke_sg_rules_ingress(revoke_sg_rules)
+            delete_sg_rules_ingress(delete_sg_rules)
 
 
 if __name__ == '__main__':
