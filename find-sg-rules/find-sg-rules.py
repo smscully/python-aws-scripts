@@ -7,7 +7,7 @@ import argparse
 import boto3
 import botocore
 import ipaddress
-import 
+import json
 import sys
 
 def check_aws_user_id() -> str:
@@ -58,23 +58,26 @@ def check_bucket(bucket: str):
 def check_key(bucket: str, key: str) -> bool:
     """Checks for S3 key; exits if exists."""
     client = boto3.client("s3")
-    if client.get_object(Bucket=f'{bucket}', Key=f'{key}') == True:
+    try:
+        client.get_object(Bucket=f'{bucket}', Key=f'{key}')
         print("The S3 object already exists. Please enter a different key value.")
         raise SystemExit(55)
+    except client.exceptions.NoSuchKey:
+        pass
 
 
 def find_sg_rules(args: list) -> list:
     """Searches for rules based on find criteria."""
     # Declare list and dictionary to store rules that meet find criteria
-    find_sg_rules: list[dict] = [] 
-    find_sg_rule: dict[str, str] = {}
+    sg_rules_list: list[dict] = [] 
+    sg_rule_dict: dict[str, str] = {}
 
     # Get dictionary of existing rules
     client = boto3.client("ec2")
-    existing_sg_rules = client.describe_security_group_rules().get("SecurityGroupRules")
+    sg_rules_existing = client.describe_security_group_rules().get("SecurityGroupRules")
 
     # Search for exising rules that meet find criteria and append to list
-    for rule in existing_sg_rules:
+    for rule in sg_rules_existing:
         if (
             rule.get("IsEgress") == eval(args.is_egress) and
             rule.get("IpProtocol") == args.ip_protocol and
@@ -82,27 +85,32 @@ def find_sg_rules(args: list) -> list:
             rule.get("ToPort") == args.to_port and
             rule.get("CidrIpv4") == args.cidr_ipv4
         ):
-            find_sg_rule = {
+            sg_rule_dict = {
                 "security_group_id":rule.get("GroupId"),
-                "security_group_rule_id":rule.get("SecurityGroupRuleId")
+                "security_group_rule_id":rule.get("SecurityGroupRuleId"),
+                "is_egress":rule.get("IsEgress"),
+                "ip_protocol":rule.get("IpProtocol"),
+                "from_port":rule.get("FromPort"),
+                "to_port":rule.get("ToPort"),
+                "cidr_ipv4":rule.get("CidrIpv4")
             }
-            find_sg_rules.append(find_sg_rule)
+            sg_rules_list.append(sg_rule_dict)
 
-    return find_sg_rules
+    return sg_rules_list
 
 
-def print_find_results(json_sg_rules: str):
+def print_find_results(sg_rules_json: str):
     """Prints find results to stdout."""
     print("The following rules were found that met the find criteria:")
-    print(json_sg_rules)
+    print(sg_rules_json)
 
 
-def write_find_results(json_sg_rules: str, bucket: str, key: str):
+def write_find_results(sg_rules_json: str, bucket: str, key: str):
     """Creates S3 object with JSON list of rules that met the find criteria."""
     client = boto3.client("s3")
     try:
         response = client.put_object(
-            Body=f'{json_sg_rules}',
+            Body=f'{sg_rules_json}',
             Bucket=f'{bucket}',
             Key=f'{key}',
             ServerSideEncryption='AES256'
@@ -139,13 +147,13 @@ def main(arguments):
     check_key(args.bucket, args.key)
 
     # Find rules that meet find criteria 
-    find_sg_rules = find_sg_rules(args)
+    sg_rules_list = find_sg_rules(args)
     # Convert list of rules that met find criteria to JSON string
-    json_sg_rules = json.dumps(find_sg_rules, indent=2)
+    sg_rules_json = json.dumps(sg_rules_list, indent=2)
     # Print find results to stdout and write to S3 bucket
-    if len(json.loads(json_sg_rules)) != 0:
-        print_find_results(json_sg_rules)
-        write_find_results(json_sg_rules, args.bucket, args.key)
+    if len(json.loads(sg_rules_json)) != 0:
+        print_find_results(sg_rules_json)
+        write_find_results(sg_rules_json, args.bucket, args.key)
     else:
         print("No rules found meeting the provided criteria.")
 
