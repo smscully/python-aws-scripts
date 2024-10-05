@@ -60,7 +60,7 @@ def find_sg_rules(args: list) -> list:
             rule.get("ToPort") == args.to_port and
             rule.get("CidrIpv4") == args.cidr_ipv4
         ):
-            sg_rule = {
+            revoke_sg_rule = {
                 "security_group_id":rule.get("GroupId"),
                 "security_group_rule_id":rule.get("SecurityGroupRuleId")
             }
@@ -75,7 +75,21 @@ def revoke_sg_rules_ingress(revoke_sg_rules: list):
     for rule in revoke_sg_rules:
         response = client.revoke_security_group_ingress(
             GroupId='{}'.format(rule['security_group_id']),
-            SecurityGroupRulesId=['{}'.format(rule['security-group_rule_id'])]
+            SecurityGroupRuleIds=['{}'.format(rule['security_group_rule_id'])]
+        )
+        if response['Return'] == True:
+            print("SUCCESS - The following rule was revoked:", rule['security_group_rule_id'])
+        else:
+            print("ERROR - The following rule was NOT revoked:", rule['security_group_rule_id'])         
+
+
+def revoke_sg_rules_egress(revoke_sg_rules: list):
+    """Revokes existing rules that match user-provided criteria."""
+    client = boto3.client("ec2")
+    for rule in revoke_sg_rules:
+        response = client.revoke_security_group_egress(
+            GroupId='{}'.format(rule['security_group_id']),
+            SecurityGroupRuleIds=['{}'.format(rule['security_group_rule_id'])]
         )
         if response['Return'] == True:
             print("SUCCESS - The following rule was revoked:", rule['security_group_rule_id'])
@@ -89,7 +103,7 @@ def main(arguments):
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('is_egress', help='False for inbound rules, True for outbound',
-        type=int, choices=['False', 'True'])
+        type=str, choices=['False', 'True'])
     parser.add_argument('ip_protocol', help='IP protocol')
     parser.add_argument('from_port', help='Lower number of port range', type=int)
     parser.add_argument('to_port', help='Upper number of port range', type=int)
