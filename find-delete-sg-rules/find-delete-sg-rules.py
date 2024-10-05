@@ -42,17 +42,17 @@ def check_cidr_ipv4(cidr_ipv4: str):
 
 
 def find_sg_rules(args: list) -> list:
-    """Searches for rules based on delete criteria."""
-    # Declare list and dictionary to store rules that meet delete criteria
-    delete_sg_rules: list[dict] = [] 
-    delete_sg_rule: dict[str, str] = {}
+    """Searches for rules based on find criteria."""
+    # Declare list and dictionary to store rules that meet find criteria
+    sg_rules_list: list[dict] = [] 
+    sg_rule_dict: dict[str, str] = {}
 
     # Get dictionary of existing rules
     client = boto3.client("ec2")
-    existing_sg_rules = client.describe_security_group_rules().get("SecurityGroupRules")
+    sg_rules_existing = client.describe_security_group_rules().get("SecurityGroupRules")
 
-    # Search for exising rules that meet delete criteria and append to list
-    for rule in existing_sg_rules:
+    # Search for exising rules that meet find criteria and append to list
+    for rule in sg_rules_existing:
         if (
             rule.get("IsEgress") == eval(args.is_egress) and
             rule.get("IpProtocol") == args.ip_protocol and
@@ -60,19 +60,19 @@ def find_sg_rules(args: list) -> list:
             rule.get("ToPort") == args.to_port and
             rule.get("CidrIpv4") == args.cidr_ipv4
         ):
-            delete_sg_rule = {
+            sg_rule_dict = {
                 "security_group_id":rule.get("GroupId"),
                 "security_group_rule_id":rule.get("SecurityGroupRuleId")
             }
-            delete_sg_rules.append(delete_sg_rule)
+            sg_rules_list.append(sg_rule_dict)
 
-    return delete_sg_rules
+    return sg_rules_list
 
 
-def delete_sg_rules_ingress(delete_sg_rules: list):
-    """Deletes existing ingress rules that meet delete criteria."""
+def delete_sg_rules_ingress(sg_rules_list: list):
+    """Deletes existing ingress rules that met find criteria."""
     client = boto3.client("ec2")
-    for rule in delete_sg_rules:
+    for rule in sg_rules_list:
         response = client.revoke_security_group_ingress(
             GroupId='{}'.format(rule['security_group_id']),
             SecurityGroupRuleIds=['{}'.format(rule['security_group_rule_id'])]
@@ -83,10 +83,10 @@ def delete_sg_rules_ingress(delete_sg_rules: list):
             print("ERROR - The following rule was NOT deleted:", rule['security_group_rule_id'])         
 
 
-def delete_sg_rules_egress(delete_sg_rules: list):
-    """Deletes existing rules that meet delete criteria."""
+def delete_sg_rules_egress(sg_rules_list: list):
+    """Deletes existing rules that met find criteria."""
     client = boto3.client("ec2")
-    for rule in delete_sg_rules:
+    for rule in sg_rules_list:
         response = client.revoke_security_group_egress(
             GroupId='{}'.format(rule['security_group_id']),
             SecurityGroupRuleIds=['{}'.format(rule['security_group_rule_id'])]
@@ -116,15 +116,15 @@ def main(arguments):
     check_port(args.to_port)
     check_cidr_ipv4(args.cidr_ipv4)
 
-    # Find rules that meet delete criteria and send to appropriate delete function 
-    delete_sg_rules = find_sg_rules(args)
-    if len(delete_sg_rules) == 0:
-        print("No rules found meeting the provided delete criteria.")
+    # Find rules that meet find criteria and send to appropriate delete function 
+    sg_rules_list = find_sg_rules(args)
+    if len(sg_rules_list) == 0:
+        print("No rules found meeting the provided criteria.")
     else:
         if eval(args.is_egress) == True:
-            delete_sg_rules_egress(delete_sg_rules)
+            delete_sg_rules_egress(sg_rules_list)
         elif eval(args.is_egress) == False:
-            delete_sg_rules_ingress(delete_sg_rules)
+            delete_sg_rules_ingress(sg_rules_list)
 
 
 if __name__ == '__main__':
