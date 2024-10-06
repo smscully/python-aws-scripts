@@ -1,0 +1,7 @@
+{
+  "is_egress": "False",
+  "ip_protocol": "udp",
+  "from_port": 22,
+  "to_port": 22,
+  "cidr_ipv4": "0.0.0.0/0"
+}
