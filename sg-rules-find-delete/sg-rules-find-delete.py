@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""Uses the AWS Boto3 Python library to find and delete security group rules that meet user-provided criteria. This program is licensed under the terms of the GNU General Public License v3.0.
+"""Uses the AWS Boto3 Python library to find and delete AWS security group rules that meet user-provided criteria. This program is licensed under the terms of the GNU General Public License v3.0.
 """
 
 import argparse
@@ -84,7 +84,7 @@ def delete_sg_rules_ingress(sg_rules_list: list):
 
 
 def delete_sg_rules_egress(sg_rules_list: list):
-    """Deletes existing rules that met find criteria."""
+    """Deletes existing egress rules that met find criteria."""
     client = boto3.client("ec2")
     for rule in sg_rules_list:
         response = client.revoke_security_group_egress(
