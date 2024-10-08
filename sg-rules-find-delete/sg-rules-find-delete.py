@@ -111,6 +111,7 @@ def main(arguments):
     args = parser.parse_args(arguments)
 
     # Check arguments
+    check_aws_user_id
     check_ip_protocol(args.ip_protocol)
     check_port(args.from_port)
     check_port(args.to_port)
