@@ -66,6 +66,12 @@ For Boto3 installation instructions, visit the AWS [Quickstart page](https://bot
 To install the script, either clone the [python-aws-scripts](..) repo or download the [sg-rules-find-delete.py](./sg-rules-find-delete.py) file to the local host. 
 
 ## Usage
+To run the script, use the syntax below:
+
+```bash
+python3 sg-rules-find-delete.py [is_egress] [ip_protocol] [from_port] [to_port] [cidr_ipv4]
+```
+
 The following example searches for and deletes any security group rules that are 1) ingress rules (False), 2) support TCP traffic (tcp), allow traffic ranging 3) from port 22 (22) and 4) to port 22 (22), and 5) allow all IPv4 addresses (0.0.0.0/0).
 
 ```bash
