@@ -17,11 +17,11 @@ def check_aws_user_id() -> str:
         raise SystemExit(50)
 
 
-def check_ip_protocol(ip_protocol: str):
-    """Checks if ip_protocol value is tcp or udp; exits on failure."""
+def check_ip_protocol(IpProtocol: str):
+    """Checks if IpProtocol value is tcp or udp; exits on failure."""
     protocols  = ["tcp", "udp"]
-    if ip_protocol not in protocols:
-        print("Invalid ip_protocol value for this script. Please enter tcp or udp.")
+    if IpProtocol not in protocols:
+        print("Invalid IpProtocol value for this script. Please enter tcp or udp.")
         raise SystemExit(51)
 
 
@@ -32,12 +32,12 @@ def check_port(port: int):
         raise SystemExit(52)
 
 
-def check_cidr_ipv4(cidr_ipv4: str):
-    """Checks if cidr_ipv4 value is a valid IPv4 CIDR address; exits on failure."""
+def check_cidr_ipv4(CidrIpv4: str):
+    """Checks if CidrIpv4 value is a valid IPv4 CIDR address; exits on failure."""
     try:
-        ip = ipaddress.ip_network(cidr_ipv4)
+        ip = ipaddress.ip_network(CidrIpv4)
     except ValueError:
-        print("Invalid cidr_ipv4 value. Please enter a valid IPv4 CIDR address.")
+        print("Invalid CidrIpv4 value. Please enter a valid IPv4 CIDR address.")
         raise SystemExit(53)
 
 
