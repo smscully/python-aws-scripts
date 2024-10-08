@@ -54,15 +54,15 @@ def find_sg_rules(args: list) -> list:
     # Search for exising rules that meet find criteria and append to list
     for rule in sg_rules_existing:
         if (
-            rule.get("IsEgress") == eval(args.is_egress) and
-            rule.get("IpProtocol") == args.ip_protocol and
-            rule.get("FromPort") == args.from_port and
-            rule.get("ToPort") == args.to_port and
-            rule.get("CidrIpv4") == args.cidr_ipv4
+            rule.get("IsEgress") == eval(args.IsEgress) and
+            rule.get("IpProtocol") == args.IpProtocol and
+            rule.get("FromPort") == args.FromPort and
+            rule.get("ToPort") == args.ToPort and
+            rule.get("CidrIpv4") == args.CidrIpv4
         ):
             sg_rule_dict = {
-                "security_group_id":rule.get("GroupId"),
-                "security_group_rule_id":rule.get("SecurityGroupRuleId")
+                "GroupId":rule.get("GroupId"),
+                "SecurityGroupRuleId":rule.get("SecurityGroupRuleId")
             }
             sg_rules_list.append(sg_rule_dict)
 
@@ -74,13 +74,13 @@ def delete_sg_rules_ingress(sg_rules_list: list):
     client = boto3.client("ec2")
     for rule in sg_rules_list:
         response = client.revoke_security_group_ingress(
-            GroupId='{}'.format(rule['security_group_id']),
-            SecurityGroupRuleIds=['{}'.format(rule['security_group_rule_id'])]
+            GroupId='{}'.format(rule['GroupId']),
+            SecurityGroupRuleIds=['{}'.format(rule['SecurityGroupRuleId'])]
         )
         if response['Return'] == True:
-            print("SUCCESS - The following rule was deleted:", rule['security_group_rule_id'])
+            print("SUCCESS - The following rule was deleted:", rule['SecurityGroupRuleId'])
         else:
-            print("ERROR - The following rule was NOT deleted:", rule['security_group_rule_id'])         
+            print("ERROR - The following rule was NOT deleted:", rule['SecurityGroupRuleId'])         
 
 
 def delete_sg_rules_egress(sg_rules_list: list):
@@ -88,13 +88,13 @@ def delete_sg_rules_egress(sg_rules_list: list):
     client = boto3.client("ec2")
     for rule in sg_rules_list:
         response = client.revoke_security_group_egress(
-            GroupId='{}'.format(rule['security_group_id']),
-            SecurityGroupRuleIds=['{}'.format(rule['security_group_rule_id'])]
+            GroupId='{}'.format(rule['GroupId']),
+            SecurityGroupRuleIds=['{}'.format(rule['SecurityGroupRuleId'])]
         )
         if response['Return'] == True:
-            print("SUCCESS - The following rule was deleted:", rule['security_group_rule_id'])
+            print("SUCCESS - The following rule was deleted:", rule['SecurityGroupRuleId'])
         else:
-            print("ERROR - The following rule was NOT deleted:", rule['security_group_rule_id'])         
+            print("ERROR - The following rule was NOT deleted:", rule['SecurityGroupRuleId'])         
 
 
 def main(arguments):
@@ -102,29 +102,29 @@ def main(arguments):
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('is_egress', help='False for inbound rules, True for outbound',
+    parser.add_argument('IsEgress', help='False for inbound rules, True for outbound',
         type=str, choices=['False', 'True'])
-    parser.add_argument('ip_protocol', help='IP protocol')
-    parser.add_argument('from_port', help='Lower number of port range', type=int)
-    parser.add_argument('to_port', help='Upper number of port range', type=int)
-    parser.add_argument('cidr_ipv4', help='Valid CIDR IPv4 address')
+    parser.add_argument('IpProtocol', help='IP protocol')
+    parser.add_argument('FromPort', help='Lower number of port range', type=int)
+    parser.add_argument('ToPort', help='Upper number of port range', type=int)
+    parser.add_argument('CidrIpv4', help='Valid CIDR IPv4 address')
     args = parser.parse_args(arguments)
 
     # Check arguments
     check_aws_user_id
-    check_ip_protocol(args.ip_protocol)
-    check_port(args.from_port)
-    check_port(args.to_port)
-    check_cidr_ipv4(args.cidr_ipv4)
+    check_ip_protocol(args.IpProtocol)
+    check_port(args.FromPort)
+    check_port(args.ToPort)
+    check_cidr_ipv4(args.CidrIpv4)
 
     # Find rules that meet find criteria and send to appropriate delete function 
     sg_rules_list = find_sg_rules(args)
     if len(sg_rules_list) == 0:
         print("No rules found meeting the provided criteria.")
     else:
-        if eval(args.is_egress) == True:
+        if eval(args.IsEgress) == True:
             delete_sg_rules_egress(sg_rules_list)
-        elif eval(args.is_egress) == False:
+        elif eval(args.IsEgress) == False:
             delete_sg_rules_ingress(sg_rules_list)
 
 

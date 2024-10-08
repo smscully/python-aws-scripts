@@ -36,7 +36,7 @@ The `main` function then checks the AWS User ID and command line arguments by ca
 The `check_port` function is called twice: once to check the `ToPort` value and a second time to check the `FromPort` value. All functions exit the script on error.
 
 ### 3. Call Core Script Functions
-Finally, `main` calls the core script functions to find and delete rules that match the criteria provided by user.
+Finally, `main` calls the core script functions to find and delete rules that match the criteria provided by the user.
 
 The `find_sg_rules` function uses the Boto3 `describe_security_group_rules` method to search for rules that match the values in the `IsEgress`, `IpProtocol`, `FromPort`, `ToPort`, and `CidrIpv4` command line arguments.
 
