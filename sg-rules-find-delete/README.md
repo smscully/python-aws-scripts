@@ -14,14 +14,14 @@ Upon invocation, the `main` function establishes the run order of the script, as
 The script first parses the required command line arguments listed below. The argument names are identical to the corresponding parmeters used by Boto3 methods.
 
 |Argument|Allowed Values|
-|--------|--|-----------|
+|--------|--------------|
 |IsEgress|False for inbound rules, True for outbound|
 |IpProtocol|tcp or udp|
 |FromPort|0-65535|
 |ToPort|0-65535|
 |CidrIpv4|Valid CIDR IPv4 address|
 
-The Python `argparse` module reads the arguments, performs type validation, and stores the values in a dictionary object. Built-in `argparse` help (-h) is also provided.
+The Python `argparse` module reads the arguments, performs type validation, and stores the values in a dictionary object. Built-in `argparse` help (-h) is available.
 
 ### 2. Check AWS User ID and Arguments
 The `main` function then checks the AWS User ID and command line arguments by calling the following functions:
@@ -29,7 +29,7 @@ The `main` function then checks the AWS User ID and command line arguments by ca
 |Function|Description|
 |--------|-----------|
 |check_aws_user_id|Checks the current AWS User ID.|
-|check_ip_protocol|Checks if IpProtocol value is tcp or udp.|
+|check_ip_protocol|Checks if IpProtocol value is valid.|
 |check_port|Checks if port range value is valid.|
 |check_cidr_ipv4|Checks if CidrIpv4 value is a valid IPv4 CIDR address.|
 
@@ -40,17 +40,17 @@ Finally, `main` calls the core script functions to find and delete rules that ma
 
 The `find_sg_rules` function uses the Boto3 `describe_security_group_rules` method to search for rules that match the values in the `IsEgress`, `IpProtocol`, `FromPort`, `ToPort`, and `CidrIpv4` command line arguments.
 
-If any matches are found, a conditional statement uses the value of the `IsEgress` argument to call either the `delete_sg_rules_ingress` or `delete_sg_rules_egress` function. Separate functions are required to delete ingress and egress rules because Boto3 uses different methods to delete each rule type.
+If any matches are found, a conditional statement uses the value of the `IsEgress` argument to call either the `delete_sg_rules_ingress` or `delete_sg_rules_egress` function. Separate functions are required to delete ingress and egress rules because Boto3 uses different methods for each rule type.
 
 ### Exit Codes
 If the script runs without an error, it returns an exit code of 0. Non-zero exit codes are as follows:
 
 |Exit Code|Description|
 |---------|-----------|
-|50|AWS User ID required|
-|51|Invalid IP Protocol value|
-|52|Invalid port range value|
-|53|Invalid IPv4 CIDR address|
+|50|AWS User ID required.|
+|51|Invalid IP Protocol value.|
+|52|Invalid port range value.|
+|53|Invalid IPv4 CIDR address.|
 
 ## Getting Started
 
