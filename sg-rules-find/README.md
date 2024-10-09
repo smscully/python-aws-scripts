@@ -1,5 +1,5 @@
 # Find AWS Security Group Rules
-The [sg-rules-find.py](./sg-rules-find) script uses the AWS Boto3 Python library to find AWS security group rules that meet user-provided criteria, then exports the list of rules to S3. A typical use case is finding insecure rules, such as those that allow SSH connections from any IPv4 address.
+The [sg-rules-find.py](./sg-rules-find.py) script uses the AWS Boto3 Python library to find AWS security group rules that meet user-provided criteria, then exports the list of rules to S3. A typical use case is finding insecure rules, such as those that allow SSH connections from any IPv4 address.
 
 To run the script against a test AWS environment, please refer to the [Terraform script](../terraform-aws-test-env) in this repository, which creates a VPC with a subnet, an EC2 instance, insecure security group rules, and insecure network ACL rules.
 
