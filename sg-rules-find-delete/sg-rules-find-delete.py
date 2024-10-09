@@ -110,7 +110,7 @@ def main(arguments):
     parser.add_argument('CidrIpv4', help='Valid CIDR IPv4 address')
     args = parser.parse_args(arguments)
 
-    # Check arguments
+    # Check AWS User ID and arguments
     check_aws_user_id
     check_ip_protocol(args.IpProtocol)
     check_port(args.FromPort)
