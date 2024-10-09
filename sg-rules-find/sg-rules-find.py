@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""Uses the AWS Boto3 Python library to find security group rules that meet user-provided criteria, then exports the list of rules to S3. This program is licensed under the terms of the GNU General Public License v3.0.
+"""Uses the AWS Boto3 Python library to find AWS security group rules that meet user-provided criteria, then exports the list of rules to S3. This program is licensed under the terms of the GNU General Public License v3.0.
 """
 
 import argparse
@@ -56,7 +56,7 @@ def check_bucket(bucket: str):
 
 
 def check_key(bucket: str, key: str) -> bool:
-    """Checks for S3 key; exits if exists."""
+    """Checks key to determine if S3 object already exists; exits if exists."""
     client = boto3.client("s3")
     try:
         client.get_object(Bucket=f'{bucket}', Key=f'{key}')
@@ -134,11 +134,11 @@ def main(arguments):
     parser.add_argument('FromPort', help='Lower number of port range', type=int)
     parser.add_argument('ToPort', help='Upper number of port range', type=int)
     parser.add_argument('CidrIpv4', help='Valid CIDR IPv4 address')
-    parser.add_argument('bucket', help='Name of existing S3 bucket')
-    parser.add_argument('key', help='Unique key of rules file object')
+    parser.add_argument('bucket', help='Name of an existing S3 bucket')
+    parser.add_argument('key', help='Unique key for the rules object')
     args = parser.parse_args(arguments)
 
-    # Check arguments
+    # Check AWS User ID and arguments
     check_aws_user_id
     check_ip_protocol(args.IpProtocol)
     check_port(args.FromPort)
