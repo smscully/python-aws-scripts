@@ -19,11 +19,11 @@ def check_aws_user_id() -> str:
         raise SystemExit(50)
 
 
-def check_ip_protocol(ip_protocol: str):
-    """Checks if ip_protocol value is tcp or udp; exits on failure."""
+def check_ip_protocol(IpProtocol: str):
+    """Checks if IpProtocol value is tcp or udp; exits on failure."""
     protocols  = ["tcp", "udp"]
-    if ip_protocol not in protocols:
-        print("Invalid ip_protocol value for this script. Please enter tcp or udp.")
+    if IpProtocol not in protocols:
+        print("Invalid IpProtocol value for this script. Please enter tcp or udp.")
         raise SystemExit(51)
 
 
@@ -34,12 +34,12 @@ def check_port(port: int):
         raise SystemExit(52)
 
 
-def check_cidr_ipv4(cidr_ipv4: str):
-    """Checks if cidr_ipv4 value is a valid IPv4 CIDR address; exits on failure."""
+def check_cidr_ipv4(CidrIpv4: str):
+    """Checks if CidrIpv4 value is a valid IPv4 CIDR address; exits on failure."""
     try:
-        ip = ipaddress.ip_network(cidr_ipv4)
+        ip = ipaddress.ip_network(CidrIpv4)
     except ValueError:
-        print("Invalid cidr_ipv4 value. Please enter a valid IPv4 CIDR address.")
+        print("Invalid CidrIpv4 value. Please enter a valid IPv4 CIDR address.")
         raise SystemExit(53)
 
 
@@ -79,20 +79,20 @@ def find_sg_rules(args: list) -> list:
     # Search for exising rules that meet find criteria and append to list
     for rule in sg_rules_existing:
         if (
-            rule.get("IsEgress") == eval(args.is_egress) and
-            rule.get("IpProtocol") == args.ip_protocol and
-            rule.get("FromPort") == args.from_port and
-            rule.get("ToPort") == args.to_port and
-            rule.get("CidrIpv4") == args.cidr_ipv4
+            rule.get("IsEgress") == eval(args.IsEgress) and
+            rule.get("IpProtocol") == args.IpProtocol and
+            rule.get("FromPort") == args.FromPort and
+            rule.get("ToPort") == args.ToPort and
+            rule.get("CidrIpv4") == args.CidrIpv4
         ):
             sg_rule_dict = {
-                "security_group_id":rule.get("GroupId"),
-                "security_group_rule_id":rule.get("SecurityGroupRuleId"),
-                "is_egress":rule.get("IsEgress"),
-                "ip_protocol":rule.get("IpProtocol"),
-                "from_port":rule.get("FromPort"),
-                "to_port":rule.get("ToPort"),
-                "cidr_ipv4":rule.get("CidrIpv4")
+                "GroupId":rule.get("GroupId"),
+                "SecurityGroupRuleId":rule.get("SecurityGroupRuleId"),
+                "IsEgress":rule.get("IsEgress"),
+                "IpProtocol":rule.get("IpProtocol"),
+                "FromPort":rule.get("FromPort"),
+                "ToPort":rule.get("ToPort"),
+                "CidrIpv4":rule.get("CidrIpv4")
             }
             sg_rules_list.append(sg_rule_dict)
 
@@ -128,21 +128,22 @@ def main(arguments):
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('is_egress', help='False for inbound rules, True for outbound',
+    parser.add_argument('IsEgress', help='False for inbound rules, True for outbound',
         type=str, choices=['False', 'True'])
-    parser.add_argument('ip_protocol', help='IP protocol')
-    parser.add_argument('from_port', help='Lower number of port range', type=int)
-    parser.add_argument('to_port', help='Upper number of port range', type=int)
-    parser.add_argument('cidr_ipv4', help='Valid CIDR IPv4 address')
+    parser.add_argument('IpProtocol', help='IP protocol')
+    parser.add_argument('FromPort', help='Lower number of port range', type=int)
+    parser.add_argument('ToPort', help='Upper number of port range', type=int)
+    parser.add_argument('CidrIpv4', help='Valid CIDR IPv4 address')
     parser.add_argument('bucket', help='Name of existing S3 bucket')
     parser.add_argument('key', help='Unique key of rules file object')
     args = parser.parse_args(arguments)
 
     # Check arguments
-    check_ip_protocol(args.ip_protocol)
-    check_port(args.from_port)
-    check_port(args.to_port)
-    check_cidr_ipv4(args.cidr_ipv4)
+    check_aws_user_id
+    check_ip_protocol(args.IpProtocol)
+    check_port(args.FromPort)
+    check_port(args.ToPort)
+    check_cidr_ipv4(args.CidrIpv4)
     check_bucket(args.bucket)
     check_key(args.bucket, args.key)
 
