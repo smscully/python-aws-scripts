@@ -20,7 +20,7 @@ The script first parses the required command line arguments listed below. The ru
 |FromPort|0-65535|
 |ToPort|0-65535|
 |CidrIpv4|Valid CIDR IPv4 address|
-|bucket|Name of existing S3 bucket|
+|bucket|Name of an existing S3 bucket|
 |key|Unique key for the rules object|
 
 The Python `argparse` module reads the arguments, performs type validation, and stores the values in a dictionary object. Built-in `argparse` help (-h) is available.
@@ -40,7 +40,7 @@ The `main` function then checks the AWS User ID and command line arguments by ca
 The `check_port` function is called twice: once to check the `ToPort` value and a second time to check the `FromPort` value. All functions exit the script on error.
 
 ### 3. Call Core Script Functions
-Finally, `main` calls the core script functions to find rules that match the criteria provided by the user, then prints the results to stdout and exports the list of rules to S3.
+Finally, `main` calls the core script functions to find rules that match the criteria provided by the user, print the results to stdout, and export the list of rules to S3.
 
 The `find_sg_rules` function uses the Boto3 `describe_security_group_rules` method to search for rules that match the values in the `IsEgress`, `IpProtocol`, `FromPort`, `ToPort`, and `CidrIpv4` command line arguments.
 
@@ -65,7 +65,7 @@ If the script runs without an error, it returns an exit code of 0. Non-zero exit
 
 + Python: Version 3.8 or higher
 + AWS Boto3 Library: Latest version
-+ Established connection to AWS account
++ Established connection to an AWS account
 
 For Boto3 installation instructions, visit the AWS Boto3 [Quickstart page](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html). Following best security practices, the script does not create a Boto3 client connection using hard coded credentials. As such, it is expected that the user has established a connection to AWS, and the script will therefore load credential parameters from the local environmental variables, the AWS config file, or the AWS shared credential file. For instructions, review the Boto3 [Credentials page](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html).
 
@@ -81,7 +81,7 @@ python3 sg-rules-find.py [IsEgress] [IpProtocol] [FromPort] [ToPort] [CidrIpv4] 
 
 As an example, the command below searches for ingress security group rules (IsEgress=False) that support TCP traffic (IpProtocol=tcp), allow traffic ranging from port 22 (FromPort=22) to port 22 (ToPort=22), and accept any IPv4 address (CidrIpv4=0.0.0.0/0).
 
-If any rules are found, they are printed to stdout and exported to the S3 bucket called test-bucket-001 (bucket=test-bucket-001) with an object key of results.json (key=results.json).
+If any rules are found, they are printed to stdout and exported to the S3 bucket called "test-bucket-001" (bucket=test-bucket-001) with an object key of "results.json" (key=results.json).
 
 ```bash
 python3 sg-rules-find.py False tcp 22 22 0.0.0.0/0 test-bucket-001 results.json 
