@@ -1,6 +1,6 @@
 {
-  "ip_protocol": "tcp",
-  "from_port": 22,
-  "to_port": 22,
-  "cidr_ipv4": "0.0.0.0/0"
+  "IpProtocol": "tcp",
+  "FromPort": 63456,
+  "ToPort": 63456,
+  "CidrIpv4": "192.168.100.100/32"
 }

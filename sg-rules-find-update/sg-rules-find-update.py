@@ -19,19 +19,19 @@ def check_aws_user_id() -> str:
         raise SystemExit(50)
 
 
-def check_is_egress(is_egress: str):
-    """Checks if is_egress value is true or false; exits on failure."""
+def check_is_egress(IsEgress: str):
+    """Checks if IsEgress value is true or false; exits on failure."""
     egress = ["True", "False"]
-    if is_egress not in egress:
-        print("Invalid is_egress value for this script. Please enter True or False.")
+    if IsEgress not in egress:
+        print("Invalid IsEgress value for this script. Please enter True or False.")
         raise SystemExit(51)
 
 
-def check_ip_protocol(ip_protocol: str):
-    """Checks if ip_protocol value is tcp or udp; exits on failure."""
+def check_ip_protocol(IpProtocol: str):
+    """Checks if IpProtocol value is tcp or udp; exits on failure."""
     protocols  = ["tcp", "udp"]
-    if ip_protocol not in protocols:
-        print("Invalid ip_protocol value for this script. Please enter tcp or udp.")
+    if IpProtocol not in protocols:
+        print("Invalid IpProtocol value for this script. Please enter tcp or udp.")
         raise SystemExit(52)
 
 
@@ -42,12 +42,12 @@ def check_port(port: int):
         raise SystemExit(53)
 
 
-def check_cidr_ipv4(cidr_ipv4: str):
-    """Checks if cidr_ipv4 value is a valid IPv4 CIDR address; exits on failure."""
+def check_cidr_ipv4(CidrIpv4: str):
+    """Checks if CidrIpv4 value is a valid IPv4 CIDR address; exits on failure."""
     try:
-        ip = ipaddress.ip_network(cidr_ipv4)
+        ip = ipaddress.ip_network(CidrIpv4)
     except ValueError:
-        print("Invalid cidr_ipv4 value. Please enter a valid IPv4 CIDR address.")
+        print("Invalid CidrIpv4 value. Please enter a valid IPv4 CIDR address.")
         raise SystemExit(54)
 
 
@@ -65,11 +65,11 @@ def find_sg_rules(find_params_file: str) -> str:
     find_params_file_json = json.load(find_params_file_src)
 
     # Check that find params file criteria are valid
-    check_is_egress(find_params_file_json['is_egress'])
-    check_ip_protocol(find_params_file_json['ip_protocol'])
-    check_port(find_params_file_json['from_port'])
-    check_port(find_params_file_json['to_port'])
-    check_cidr_ipv4(find_params_file_json['cidr_ipv4'])
+    check_is_egress(find_params_file_json['IsEgress'])
+    check_ip_protocol(find_params_file_json['IpProtocol'])
+    check_port(find_params_file_json['FromPort'])
+    check_port(find_params_file_json['ToPort'])
+    check_cidr_ipv4(find_params_file_json['CidrIpv4'])
 
     # Declare list and dictionary to store rules that meet find criteria
     sg_rules_list: list[dict] = [] 
@@ -82,15 +82,15 @@ def find_sg_rules(find_params_file: str) -> str:
     # Search for exising rules that meet find params file criteria and append to list
     for rule in sg_rules_existing:
         if (
-            rule.get("IsEgress") == eval(find_params_file_json['is_egress']) and
-            rule.get("IpProtocol") == find_params_file_json['ip_protocol'] and
-            rule.get("CidrIpv4") == find_params_file_json['cidr_ipv4'] and
-            rule.get("FromPort") == find_params_file_json['from_port'] and
-            rule.get("ToPort") == find_params_file_json['to_port']
+            rule.get("IsEgress") == eval(find_params_file_json['IsEgress']) and
+            rule.get("IpProtocol") == find_params_file_json['IpProtocol'] and
+            rule.get("FromPort") == find_params_file_json['FromPort'] and
+            rule.get("ToPort") == find_params_file_json['ToPort'] and
+            rule.get("CidrIpv4") == find_params_file_json['CidrIpv4']
         ):
             sg_rule_dict = {
-                "security_group_id":rule.get("GroupId"),
-                "security_group_rule_id":rule.get("SecurityGroupRuleId"),
+                "GroupId":rule.get("GroupId"),
+                "SecurityGroupRuleId":rule.get("SecurityGroupRuleId"),
             }
             sg_rules_list.append(sg_rule_dict)
 
@@ -106,10 +106,10 @@ def update_sg_rules(update_params_file: str, sg_rules_json: str):
     update_params_file_json = json.load(update_params_file_src)
 
     # Check that update params file values are valid
-    check_ip_protocol(update_params_file_json['ip_protocol'])
-    check_port(update_params_file_json['from_port'])
-    check_port(update_params_file_json['to_port'])
-    check_cidr_ipv4(update_params_file_json['cidr_ipv4'])
+    check_ip_protocol(update_params_file_json['IpProtocol'])
+    check_port(update_params_file_json['FromPort'])
+    check_port(update_params_file_json['ToPort'])
+    check_cidr_ipv4(update_params_file_json['CidrIpv4'])
 
     # Parse JSON string and convert into dictionary
     sg_rules_json_dict = json.loads(sg_rules_json)
@@ -118,23 +118,23 @@ def update_sg_rules(update_params_file: str, sg_rules_json: str):
     client_ec2 = boto3.client("ec2")
     for rule in sg_rules_json_dict:
         response = client_ec2.modify_security_group_rules(
-            GroupId='{}'.format(rule['security_group_id']),
+            GroupId='{}'.format(rule['GroupId']),
             SecurityGroupRules=[
                 {
-                    'SecurityGroupRuleId': '{}'.format(rule['security_group_rule_id']),
+                    'SecurityGroupRuleId': '{}'.format(rule['SecurityGroupRuleId']),
                     'SecurityGroupRule': {
-                        'IpProtocol': '{}'.format(update_params_file_json['ip_protocol']),
-                        'FromPort': update_params_file_json['from_port'],
-                        'ToPort': update_params_file_json['to_port'],
-                        'CidrIpv4': '{}'.format(update_params_file_json['cidr_ipv4'])
+                        'IpProtocol': '{}'.format(update_params_file_json['IpProtocol']),
+                        'FromPort': update_params_file_json['FromPort'],
+                        'ToPort': update_params_file_json['ToPort'],
+                        'CidrIpv4': '{}'.format(update_params_file_json['CidrIpv4'])
                     }
                 },
             ],
         )
         if response['Return'] == True:
-            print("SUCCESS - The following rule was updated:", rule['security_group_rule_id'])
+            print("SUCCESS - The following rule was updated:", rule['SecurityGroupRuleId'])
         else:
-            print("ERROR - The following rule was NOT updated:", rule['security_group_rule_id'])         
+            print("ERROR - The following rule was NOT updated:", rule['SecurityGroupRuleId'])         
 
 
 def main(arguments):
@@ -146,7 +146,8 @@ def main(arguments):
     parser.add_argument('update_params_file', help='Path to file with update params')
     args = parser.parse_args(arguments)
 
-    # Check that params files exist
+    # Check AWS User ID and that params files exist
+    check_aws_user_id
     check_params_file(args.find_params_file)
     check_params_file(args.update_params_file)
 
