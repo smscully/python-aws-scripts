@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""Uses the AWS Boto3 Python library to find and update security group rules based on user-provided criteria. This program is licensed under the terms of the GNU General Public License v3.0.
+"""Uses the AWS Boto3 Python library to find and update AWS security group rules based on user-provided criteria. This program is licensed under the terms of the GNU General Public License v3.0.
 """
 
 import argparse
@@ -142,8 +142,8 @@ def main(arguments):
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('find_params_file', help='Path to file with find params')
-    parser.add_argument('update_params_file', help='Path to file with update params')
+    parser.add_argument('find_params_file', help='Path to the JSON file with find params')
+    parser.add_argument('update_params_file', help='Path to the JSON file with update params')
     args = parser.parse_args(arguments)
 
     # Check AWS User ID and that params files exist
