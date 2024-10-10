@@ -30,20 +30,41 @@ The `main` function then checks the AWS User ID and confirms the params files ex
 |check_aws_user_id|Checks the current AWS User ID.|
 |check_params_file|Checks if the params file exists.|
 
-The `check_params_file function is called twice: once to check the `find_params_file` path and a second time to check the `update_params_file` path. Both functions exit the script on error.
+The `check_params_file` function is called twice: once to check the `find_params_file` path and a second time to check the `update_params_file` path. Both functions exit the script on error.
 
 ### 3. Call Core Script Functions
 Finally, `main` calls the core script functions to find rules that match the criteria provided by the user, then update the rules.
 
-??Revise this to two sentences??
-The `find_sg_rules` function uses the Boto3 `describe_security_group_rules` method to search for rules that match the values for the `IsEgress`, `IpProtocol`, `FromPort`, `ToPort`, and `CidrIpv4` field names in the JSON file identified by the `find_params_file` argument.
+The `find_sg_rules` function uses the Boto3 `describe_security_group_rules` method to search for rules that match the key-value pairs in the JSON file identified by the `find_params_file` argument. The example file in the repository is called find.json, and while the file name is flexible, it must be JSON formated and contain the keys shown in the example below:
 
-The results returned by the `find_sg_rules` function are converted to a JSON string, and if any matches were found, the `print_find_results` and `write_find_results` functions are called. The `print_find_results` function simply prints the JSON string of rules to stdout, while `write_find_results` uses the Boto3 S3 client `put_object` method to write the JSON string to the S3 bucket.
-???
-For the AWS Security Group rule IP Protocol value, valid values are the range of IANA protocol numbers and certain string values. (See [here]( https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_SecurityGroupRule.html).) This script, however, limits the IP Protocols to TCP and UDP, primarily because the error checking required to avoid Boto3 exceptions to the ` modify_security_group_rules` function is beyond the scope of this script. As an example, modifying a rule to accept all protocols would then required that the from_port and to_port values be null, while modifying a rule to accept the ICMPv6 protocol would require the port range to be either not be specified or specified as from=-1 and to=-1. These and other particular cases ???
-NOTE: The `find.json` and `update.json` files differ in that there is no is_egress parameter in the `fix.json` file. The reason for this is that the egress state of a security group rule cannot be modified using Boto3. The Boto3 `describe_security_group_rules` function(?) supports searching for rules based on the egress state, but the corresponding Boto3 `modify_security_group_rules` does no provide the option to change the egress state.
+```json
+{
+  "IsEgress": "False",
+  "IpProtocol": "tcp",
+  "FromPort": 22,
+  "ToPort": 22,
+  "CidrIpv4": "0.0.0.0/0"
+}
+```
 
-For demonstration purposes, the `update.json` file included in the repository updates the insecure IPv4 CIDR address to a private IP address. 
+The results returned by the `find_sg_rules` function are a JSON string, and if any matches were found, the `update_sg_rules` is called. This function updates the rules returned by `find_sg_rules` with the values listed in the JSON file identified by the `update_params_file` argument. The example file in the repository is called update.json, and while the file name is flexible, it must be JSON formated and contain the keys shown in the example below:
+
+```json
+{
+  "IpProtocol": "tcp",
+  "FromPort": 63456,
+  "ToPort": 63456,
+  "CidrIpv4": "192.168.100.100/32"
+}
+```
+
+For each rule, a success or failure message will be printed to stdout.
+
+### Difference Between Find and Update Params Files 
+The `find.json` and `update.json` files differ in that there is no IsEgress parameter in the `update.json` file. The reason for this is that the egress state of a security group rule cannot be modified using Boto3. The Boto3 `describe_security_group_rules` method supports searching for rules based on the egress state, but the corresponding Boto3 `modify_security_group_rules` does no provide the option to change the egress state.
+
+### Limitations on IP Protocol Values
+For the AWS Security Group rule IP Protocol parameter, valid values are the range of IANA protocol numbers and certain string values. (See [here]( https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_SecurityGroupRule.html).) This script, however, limits the IpProtocol key to the values tcp and udp. The reason for this is that the error checking required to avoid Boto3 exceptions to the ` modify_security_group_rules` function is beyond the scope of this script. As an example, modifying a rule to accept all protocols would then required that the FromPort and ToPort values be null, while modifying a rule to accept the ICMPv6 protocol would require the port range to be either not be specified or specified as FromPort=-1 and ToPort=-1.
 
 ### Exit Codes
 If the script runs without an error, it returns an exit code of 0. Non-zero exit codes are as follows:
@@ -75,33 +96,13 @@ To install the script, either clone the [python-aws-scripts](..) repo or downloa
 To run the script, use the syntax below:
 
 ```bash
-python3 sg-rules-find.py [IsEgress] [IpProtocol] [FromPort] [ToPort] [CidrIpv4] [bucket] [key]
+python3 sg-rules-find.py [find_params_file] [update_params_file]
 ```
 
-```json
-{
-  "IsEgress": "False",
-  "IpProtocol": "tcp",
-  "FromPort": 22,
-  "ToPort": 22,
-  "CidrIpv4": "0.0.0.0/0"
-}
-```
-
-```json
-{
-  "IpProtocol": "tcp",
-  "FromPort": 63456,
-  "ToPort": 63456,
-  "CidrIpv4": "192.168.100.100/32"
-}
-```
-As an example, the command below searches for ingress security group rules (IsEgress=False) that support TCP traffic (IpProtocol=tcp), allow traffic ranging from port 22 (FromPort=22) to port 22 (ToPort=22), and accept any IPv4 address (CidrIpv4=0.0.0.0/0).
-
-If any rules are found, they are printed to stdout and exported to the S3 bucket called "test-bucket-001" (bucket=test-bucket-001) with an object key of "results.json" (key=results.json).
+For demonstration purposes, the `update.json` file included in the repository updates the insecure IPv4 CIDR address to a private IP address.
 
 ```bash
-python3 sg-rules-find.py False tcp 22 22 0.0.0.0/0 test-bucket-001 results.json 
+python3 sg-rules-find.py find.json update.json
 ```
 
 ## License
