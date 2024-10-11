@@ -35,7 +35,7 @@ The `check_params_file` function is called twice: once to check the `find_params
 ### 3. Call Core Script Functions
 Finally, `main` calls the core script functions to find rules that match the criteria provided by the user, then updates the rules.
 
-The `find_sg_rules` function uses the Boto3 `describe_security_group_rules` method to search for rules that match the key-value pairs in the JSON file identified by the `find_params_file` argument. The example file in the repository is called find.json, and while the file name is flexible, it must be JSON formated and contain the keys shown in the example below:
+The `find_sg_rules` function uses the Boto3 `describe_security_group_rules` method to search for rules that match the key-value pairs in the JSON file identified by the `find_params_file` argument. The example file in the repository is called find.json, and while the file name is flexible, it must be JSON formatted and contain the keys shown in the example below:
 
 ```json
 {
@@ -47,7 +47,7 @@ The `find_sg_rules` function uses the Boto3 `describe_security_group_rules` meth
 }
 ```
 
-If `find_sg_rules` returns any matches, the `update_sg_rules` function is called. This function updates the rules returned by `find_sg_rules` with the values listed in the JSON file identified by the `update_params_file` argument. The example file in the repository is called update.json, and while the file name is flexible, it must be JSON formated and contain the keys shown in the example below:
+If `find_sg_rules` returns any matches, the `update_sg_rules` function is called. This function updates the rules returned by `find_sg_rules` with the values listed in the JSON file identified by the `update_params_file` argument. The example file in the repository is called update.json, and while the file name is flexible, it must be JSON formatted and contain the keys shown in the example below:
 
 ```json
 {
