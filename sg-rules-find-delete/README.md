@@ -11,7 +11,7 @@ Upon invocation, the `main` function establishes the run order of the script, as
 + Call Core Script Functions
 
 ### 1. Parse Arguments
-The script first parses the required command line arguments listed below. The argument names are identical to the corresponding parmeters used by Boto3 methods.
+The script first parses the required command line arguments listed below. The argument names are identical to the corresponding parameters used by Boto3 methods.
 
 |Argument|Allowed Values|
 |--------|--------------|
@@ -40,7 +40,7 @@ Finally, `main` calls the core script functions to find and delete rules that ma
 
 The `find_sg_rules` function uses the Boto3 `describe_security_group_rules` method to search for rules that match the values in the `IsEgress`, `IpProtocol`, `FromPort`, `ToPort`, and `CidrIpv4` command line arguments.
 
-If any matches are found, a conditional statement uses the value of the `IsEgress` argument to call either the `delete_sg_rules_ingress` or `delete_sg_rules_egress` function. Separate functions are required to delete ingress and egress rules because Boto3 uses different methods for each rule type.
+If `find_sg_rules` returns any matches, a conditional statement uses the value of the `IsEgress` argument to call either the `delete_sg_rules_ingress` or `delete_sg_rules_egress` function. Separate functions are required to delete ingress and egress rules because Boto3 uses different methods for each rule type.
 
 ### Exit Codes
 If the script runs without an error, it returns an exit code of 0. Non-zero exit codes are as follows:
