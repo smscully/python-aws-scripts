@@ -44,7 +44,7 @@ Finally, `main` calls the core script functions to find rules that match the cri
 
 The `find_sg_rules` function uses the Boto3 `describe_security_group_rules` method to search for rules that match the values in the `IsEgress`, `IpProtocol`, `FromPort`, `ToPort`, and `CidrIpv4` command line arguments.
 
-The results returned by the `find_sg_rules` function are converted to a JSON string, and if any matches were found, the `print_find_results` and `write_find_results` functions are called. The `print_find_results` function simply prints the JSON string of rules to stdout, while `write_find_results` uses the Boto3 S3 client `put_object` method to write the JSON string to the S3 bucket.
+If `find_sg_rules` returns any matches, the `print_find_results` and `write_find_results` functions are called. The `print_find_results` function prints the rules in JSON format to stdout, while `write_find_results` uses the Boto3 S3 client `put_object` method to write the JSON formated rules to the S3 bucket.
 
 ### Exit Codes
 If the script runs without an error, it returns an exit code of 0. Non-zero exit codes are as follows:
