@@ -11,7 +11,7 @@ Upon invocation, the `main` function establishes the run order of the script, as
 + Call Core Script Functions
 
 ### 1. Parse Arguments
-The script first parses the required command line arguments listed below. The rule-related argument names are identical to the corresponding parmeters used by Boto3 methods. The `bucket` argument must point to an existing S3 bucket, and the `key` argument must consist of a key not currently used by an object in the S3 bucket.
+The script first parses the required command line arguments listed below. The rule-related argument names are identical to the corresponding parameters used by Boto3 methods. The `bucket` argument must point to an existing S3 bucket, and the `key` argument must consist of a key not currently used by an object in the S3 bucket.
 
 |Argument|Allowed Values|
 |--------|--------------|
@@ -44,7 +44,7 @@ Finally, `main` calls the core script functions to find rules that match the cri
 
 The `find_sg_rules` function uses the Boto3 `describe_security_group_rules` method to search for rules that match the values in the `IsEgress`, `IpProtocol`, `FromPort`, `ToPort`, and `CidrIpv4` command line arguments.
 
-If `find_sg_rules` returns any matches, the `print_find_results` and `write_find_results` functions are called. The `print_find_results` function prints the rules in JSON format to stdout, while `write_find_results` uses the Boto3 S3 client `put_object` method to write the JSON formated rules to the S3 bucket.
+If `find_sg_rules` returns any matches, the `print_find_results` and `write_find_results` functions are called. The `print_find_results` function prints the rules in JSON format to stdout, while `write_find_results` uses the Boto3 S3 client `put_object` method to write the JSON formatted rules to the S3 bucket.
 
 ### Exit Codes
 If the script runs without an error, it returns an exit code of 0. Non-zero exit codes are as follows:
