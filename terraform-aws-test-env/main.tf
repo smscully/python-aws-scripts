@@ -51,13 +51,18 @@ resource "aws_subnet" "subnet" {
 ########################################
 resource "aws_route_table" "route_table" {
   vpc_id = aws_vpc.vpc.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.internet_gateway.id
-  }
   tags = {
     Name = "${var.environment_name} Subnet Public Route Table"
   }
+}
+
+########################################
+# Create Route Table Route
+########################################
+resource "aws_route" "route_table" {
+  route_table_id = aws_route_table.route_table.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id = aws_internet_gateway.internet_gateway.id
 }
 
 ########################################
@@ -158,6 +163,14 @@ resource "aws_network_acl_rule" "network_acl_rule_outbound_110" {
 }
 
 ########################################
+# Create AWS Key Pair
+########################################
+resource "aws_key_pair" "key_pair" {
+  key_name   = "aws-test-env-ed25519"
+  public_key = file("~/.ssh/aws-test-env-ed25519.pub")
+}
+
+########################################
 # Retrieve Instance Data
 ########################################
 data "aws_ami" "ubuntu" {
@@ -182,7 +195,7 @@ data "aws_ami" "ubuntu" {
 resource "aws_instance" "instance" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
-  # key_name = ""
+  key_name = aws_key_pair.key_pair.id
   vpc_security_group_ids = [aws_security_group.security_group.id]
   subnet_id              = aws_subnet.subnet.id
   tags = {
