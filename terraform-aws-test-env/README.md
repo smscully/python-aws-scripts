@@ -60,7 +60,7 @@ On standard Linux distributions with OpenSSH installed, the following command wi
 sudo ssh-keygen -f ~/.ssh/aws-test-env-ed25519 -t ed25519
 ```
 
-NOTE: The command above should also work for Windows and macOS implementations of OpenSSH.
+> **NOTE:** The command above should also work for Windows and macOS implementations of OpenSSH.
 
 ### Run the Terraform Script
 To run the script, follow standard Terraform practices by navigating to the directory that holds the `main.tf` script, then running the commands to initialize and apply the script:
@@ -69,6 +69,13 @@ To run the script, follow standard Terraform practices by navigating to the dire
 terraform init
 terraform plan
 terraform apply
+```
+
+### Access the EC2 Instance via SSH
+To access the EC2 instance, enter the command below in the Bash shell. To the find the IP address of the EC2 instance, check the outputs of the Terraform script, or review the instance details in the AWS console.
+
+```bash
+sudo ssh ???
 ```
 
 ## License
