@@ -55,28 +55,22 @@ To install the script, either clone the [python-aws-scripts](..) repo or downloa
 
 ### Create the SSH Key Pair
 On standard Linux distributions with OpenSSH installed, the following command will create an SSH key pair of type Ed25519 (-t ed25519) in the given location (-f ~/.ssh/aws-test-env-ed25519) expected by the Terraform script as currently configured. If a different key type or location are used, the script must be updated accordingly.
-
 ```bash
 sudo ssh-keygen -f ~/.ssh/aws-test-env-ed25519 -t ed25519
 ```
-
 > **NOTE:** The command above should also work for Windows and macOS implementations of OpenSSH.
 
 ### Run the Terraform Script
 To run the script, follow standard Terraform practices by navigating to the directory that holds the `main.tf` script, then running the commands to initialize and apply the script:
-
 ```bash
 terraform init
 terraform plan
 terraform apply
 ```
-
 ### Access the EC2 Instance via SSH
 To access the EC2 instance, enter the command below in the Bash shell. To the find the IP address of the EC2 instance, check the outputs of the Terraform script, or review the instance details in the AWS console.
-
 ```bash
 sudo ssh ???
 ```
-
 ## License
 Licensed under the [GNU General Public License v3.0](./LICENSE).
