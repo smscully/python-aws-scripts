@@ -26,7 +26,7 @@ The NACL is configured with the rules below, which allow SSH (port 22) and NetBI
 |----|-----------|--------|----------|------------------|----------|
 |Inbound|100|TCP|22|0.0.0.0/0|Allow|
 |Inbound|110|TCP|137-139|0.0.0.0/0|Allow|
-|Outbound|100|TCP|22|0.0.0.0/0|Allow|
+|Outbound|100|TCP|1024-65535|0.0.0.0/0|Allow|
 |Outbound|110|TCP|137-139|0.0.0.0/0|Allow|
 
 ### Security Group Configuration
@@ -70,7 +70,7 @@ terraform apply
 ### Access the EC2 Instance via SSH
 To access the EC2 instance, enter the command below in the Bash shell. To the find the IP address of the EC2 instance, check the outputs of the Terraform script, or review the instance details in the AWS console.
 ```bash
-sudo ssh ???
+sudo ssh -i ~/.ssh/aws-test-env-ed25519 ubuntu@[instance-ip]
 ```
 ## License
 Licensed under the [GNU General Public License v3.0](./LICENSE).
