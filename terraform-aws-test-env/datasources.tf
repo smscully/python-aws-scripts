@@ -23,7 +23,7 @@ data "aws_ami" "ubuntu-22" {
 
 data "aws_ami" "amazon-linux-2" {
   most_recent = true
-  owners = ["amazon"]
+  owners      = ["amazon"]
 
   filter {
     name   = "name"
@@ -43,7 +43,7 @@ data "aws_ami" "amazon-linux-2" {
 
 data "aws_ami" "amazon-linux-2023" {
   most_recent = true
-  owners = ["amazon"]
+  owners      = ["amazon"]
 
   filter {
     name   = "name"

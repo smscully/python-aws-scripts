@@ -60,9 +60,9 @@ resource "aws_route_table" "route_table" {
 # Create Route Table Route
 ########################################
 resource "aws_route" "route_table" {
-  route_table_id = aws_route_table.route_table.id
+  route_table_id         = aws_route_table.route_table.id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id = aws_internet_gateway.internet_gateway.id
+  gateway_id             = aws_internet_gateway.internet_gateway.id
 }
 
 ########################################
@@ -96,14 +96,6 @@ resource "aws_vpc_security_group_ingress_rule" "security_group_ingress_rule" {
   ip_protocol       = "tcp"
 }
 
-resource "aws_vpc_security_group_egress_rule" "security_group_egress_rule" {
-  security_group_id = aws_security_group.security_group.id
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = "137"
-  to_port           = "139"
-  ip_protocol       = "tcp"
-}
-
 ########################################
 # Create Network ACL
 ########################################
@@ -129,17 +121,6 @@ resource "aws_network_acl_rule" "network_acl_rule_inbound_100" {
   to_port        = 22
 }
 
-resource "aws_network_acl_rule" "network_acl_rule_inbound_110" {
-  network_acl_id = aws_network_acl.network_acl.id
-  rule_number    = "110"
-  egress         = false
-  protocol       = "tcp"
-  rule_action    = "allow"
-  cidr_block     = "0.0.0.0/0"
-  from_port      = 137
-  to_port        = 139
-}
-
 resource "aws_network_acl_rule" "network_acl_rule_outbound_100" {
   network_acl_id = aws_network_acl.network_acl.id
   rule_number    = "100"
@@ -149,17 +130,6 @@ resource "aws_network_acl_rule" "network_acl_rule_outbound_100" {
   cidr_block     = "0.0.0.0/0"
   from_port      = 1024
   to_port        = 65535
-}
-
-resource "aws_network_acl_rule" "network_acl_rule_outbound_110" {
-  network_acl_id = aws_network_acl.network_acl.id
-  rule_number    = "110"
-  egress         = true
-  protocol       = "tcp"
-  rule_action    = "allow"
-  cidr_block     = "0.0.0.0/0"
-  from_port      = 137
-  to_port        = 139
 }
 
 ########################################
@@ -174,9 +144,9 @@ resource "aws_key_pair" "key_pair" {
 # Create Instance
 ########################################
 resource "aws_instance" "instance" {
-  ami           = data.aws_ami.ubuntu-22.id
-  instance_type = "t2.micro"
-  key_name = aws_key_pair.key_pair.key_name
+  ami                    = data.aws_ami.ubuntu-22.id
+  instance_type          = "t2.micro"
+  key_name               = aws_key_pair.key_pair.key_name
   vpc_security_group_ids = [aws_security_group.security_group.id]
   subnet_id              = aws_subnet.subnet.id
   tags = {
