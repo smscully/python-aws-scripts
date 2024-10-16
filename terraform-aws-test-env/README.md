@@ -40,6 +40,15 @@ The Security Group is configured with the rules below, which allow SSH (port 22)
 ### Key Pair Configuration
 To access the EC2 instance, the public key of an SSH key pair must uploaded to AWS and attached to the instance. Although an existing key pair can be used, the usage instructions below provide the steps to create a new Ed25519 key pair with a name and location that matches the path in the Terraform script.
 
+### Amazon Machine Images: datasources.tf
+As currently configured, `main.tf` creates an EC2 instance from the Ubuntu 22.04 Amazon Machine Image (AMI). The `datasources.tf` file includes `aws_ami` definitions for other AMIs, which can be used by modifying the `ami` argument of the `aws_instance.instance` resource in `main.tf` to reference a different data source name. The following AMIs are defined in `datasources.tf`.
+
+|AWS AMI|Data Source Name|
+|-------|----------------|
+|Ubuntu 22.04|ubuntu-22|
+|Amazon Linux 2|amazon-linux-2|
+|Amazon Linux 2023|amazon-linux-2023|
+
 ## Getting Started
 
 ### Dependencies
@@ -56,7 +65,7 @@ To install the script, either clone the [python-aws-scripts](..) repo or downloa
 ### Create the SSH Key Pair
 On standard Linux distributions with OpenSSH installed, the following command will create an SSH key pair of type Ed25519 (-t ed25519) in the given location (-f ~/.ssh/aws-test-env-ed25519) expected by the Terraform script as currently configured. If a different key type or location are used, the script must be updated accordingly.
 ```bash
-sudo ssh-keygen -f ~/.ssh/aws-test-env-ed25519 -t ed25519
+ssh-keygen -f ~/.ssh/aws-test-env-ed25519 -t ed25519
 ```
 > **NOTE:** The command above should also work for Windows and macOS implementations of OpenSSH.
 
@@ -64,13 +73,14 @@ sudo ssh-keygen -f ~/.ssh/aws-test-env-ed25519 -t ed25519
 To run the script, follow standard Terraform practices by navigating to the directory that holds the `main.tf` script, then running the commands to initialize and apply the script:
 ```bash
 terraform init
+terraform validate
 terraform plan
-terraform apply
+terraform apply -auto-approve
 ```
 ### Access the EC2 Instance via SSH
-To access the EC2 instance, enter the command below in the Bash shell. To the find the IP address of the EC2 instance, check the outputs of the Terraform script, or review the instance details in the AWS console.
+To access the Ubuntu 22.04 EC2 instance, enter the command below in the Bash shell. Change the username accordingly if using a different AWS AMI. To the find the IP address of the EC2 instance, check the outputs of the Terraform script, or review the instance details in the AWS console.
 ```bash
-sudo ssh -i ~/.ssh/aws-test-env-ed25519 ubuntu@[instance-ip]
+ssh -i ~/.ssh/aws-test-env-ed25519 ubuntu@[instance-ip]
 ```
 ## License
 Licensed under the [GNU General Public License v3.0](./LICENSE).
