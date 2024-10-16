@@ -37,7 +37,7 @@ The NACL is configured with the rules below, which allow SSH (port 22) traffic. 
 ### Key Pair Configuration
 To access the EC2 instance, the public key of an SSH key pair must uploaded to AWS and attached to the instance. Although an existing key pair can be used, the usage instructions below provide the steps to create a new Ed25519 key pair with a name and location that matches the path in the Terraform script.
 
-### Amazon Machine Images: datasources.tf
+### Amazon Machine Images: [datasources.tf](./datasources.tf)
 As currently configured, `main.tf` creates an EC2 instance from the Ubuntu 22.04 Amazon Machine Image (AMI). The `datasources.tf` file includes `aws_ami` definitions for other AMIs, specifically Amazon Linux 2 and Amazon Linux 2023. To change the AMI, modify the `ami` argument of the `aws_instance.instance` resource in `main.tf` to reference a different data source name. The following AMIs are defined in `datasources.tf`.
 
 |AWS AMI|Data Source Name|
@@ -86,4 +86,4 @@ ssh -i ~/.ssh/aws-test-env-ed25519 ubuntu@[instance-ip]
 ```
 
 ## License
-Licensed under the [GNU General Public License v3.0](./LICENSE).
+Licensed under the [GNU General Public License v3.0](../LICENSE).
