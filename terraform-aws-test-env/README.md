@@ -20,7 +20,7 @@ The [main.tf](./main.tf) script creates the AWS resources listed below.
 + EC2 Instance 
 
 ### Security Group Configuration
-The Security Group is configured with the rules below, which allow SSH (port 22) ingress traffic. Because security groups are stateful, no corresponding outbound rule is required.
+The Security Group is configured with the rule below, which allows SSH (port 22) inbound traffic. Because security groups are stateful, no corresponding outbound rule is required.
 
 |Type|Protocol|Port Range|Source/Destination|
 |----|--------|----------|------------------|
