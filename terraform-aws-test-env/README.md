@@ -5,7 +5,7 @@ The architectural diagram below shows the AWS resources created by the script.
 
 ![AWS-Test-Env diagram](./img/aws-test-env.png)
 
-Before launching the script, review the resources that will be created, as the EC2 instance may incur charges depending on plan type. Please refer to the [Amazon VPC Pricing](https://aws.amazon.com/vpc/pricing/) page for specific regional pricing.  
+Before launching the script, review the resources that will be created, as the EC2 instance may incur charges depending on plan type. Please refer to the [Amazon Pricing](https://aws.amazon.com/pricing/) page for specific regional pricing.  
 
 ## Script Overview
 The [main.tf](./main.tf) script creates the AWS resources listed below.
