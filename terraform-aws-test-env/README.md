@@ -79,7 +79,7 @@ terraform apply -auto-approve
 ```
 
 ### Access the EC2 Instance via SSH
-To access the Ubuntu 22.04 EC2 instance, enter the command below in the shell. Change the username to `ec2-user` if using an Amazon Liunux AMI. The IP address of the EC2 instance is displayed as an output of the Terraform script.
+To access the Ubuntu 22.04 EC2 instance, enter the command below in the shell. Change the username to `ec2-user` if using an Amazon Linux AMI. The IP address of the EC2 instance is displayed as an output of the Terraform script.
 
 ```bash
 ssh -i ~/.ssh/aws-test-env-ed25519 ubuntu@[instance-ip]
